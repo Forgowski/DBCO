@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Czas generowania: 23 Lis 2023, 15:47
+-- Czas generowania: 23 Lis 2023, 16:13
 -- Wersja serwera: 10.4.27-MariaDB
 -- Wersja PHP: 8.2.0
 
@@ -21,6 +21,24 @@ SET time_zone = "+00:00";
 -- Baza danych: `km_projekt`
 --
 
+DELIMITER $$
+--
+-- Funkcje
+--
+CREATE DEFINER=`root`@`localhost` FUNCTION `try_log_in` (`email` VARCHAR(40), `password` VARCHAR(256)) RETURNS INT(11)  BEGIN
+DECLARE user_id INT;
+
+SELECT user.id INTO user_id from user WHERE user.email=email AND user.password=password;
+
+if user_id is null then
+RETURN -1;
+ELSE
+RETURN user_id;
+END IF;
+END$$
+
+DELIMITER ;
+
 -- --------------------------------------------------------
 
 --
@@ -35,6 +53,13 @@ CREATE TABLE `user` (
   `password` varchar(256) NOT NULL,
   `isAdmin` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Zrzut danych tabeli `user`
+--
+
+INSERT INTO `user` (`id`, `firstName`, `lastName`, `email`, `password`, `isAdmin`) VALUES
+(1, 'test', 'test', 'test', 'test', 0);
 
 --
 -- Indeksy dla zrzutów tabel
@@ -54,7 +79,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT dla tabeli `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
