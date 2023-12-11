@@ -1,5 +1,6 @@
 <?php
 include "../admin/Content.php";
+include "../admin/Question.php";
 
 class DbConnector
 {
@@ -14,7 +15,12 @@ class DbConnector
     private $DELETE_COURSE_BY_ID = "DELETE FROM course WHERE id = ?;";
     private $DELETE_CONTENT_BY_ID = "DELETE FROM content WHERE order_num = ? AND course_id = ?;";
     private $FIND_LAST_ORDER_NUM = "SELECT order_num FROM content WHERE course_id = ? ORDER BY order_num DESC LIMIT 1;";
+    private $FIND_LAST_QUESTION_ORDER_NUM = "SELECT order_num FROM question WHERE quizId = ? ORDER BY order_num DESC LIMIT 1;";
+
     private $UPDATE_CONTENT_TITLE = "UPDATE content SET title = ? WHERE course_id = ? AND order_num = ?;";
+    private $CREATE_QUIZ = "INSERT INTO quiz (max_point) VALUES (?)";
+    private $INSERT_QUESTION = "INSERT INTO question (quizId, question, answerA, answerB, answerC, answerD, correctAnswer, point, order_num) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
 
     private $CREATE_COURSE = "INSERT INTO course (name, author, description, price, category, aprox_lenght_min, rate, vote_num) 
 VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
@@ -27,6 +33,10 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
     private $GET_ARTICLE = "SELECT text_content FROM article WHERE ID = ?;";
     private $INSERT_TO_CONTENT = "INSERT INTO content (course_id, order_num, type, ext_resource_id, title) VALUES (?, ?, ?, ?, ?);";
     private $GET_CONTENT = "SELECT * FROM content WHERE course_id = ? AND order_num = ?;";
+    private $GET_QUIZ_MAX_POINT = "SELECT max_point FROM quiz WHERE id = ?;";
+    private $UPDATE_MAX_POINT = "UPDATE quiz SET max_point = ? WHERE id = ?;";
+    private $GET_ALL_QUESTION_FOR_QUIZ = "SELECT * FROM question where quizId = ? order by order_num;";
+    private $DELETE_QUESTION = "DELETE FROM question WHERE quizId = ? AND order_num = ?;";
 
     private $host = "localhost";
     private $username = "root";
@@ -170,6 +180,91 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
         $stmt->close();
         $this->close();
     }
+    public function createQuiz($maxPoint){
+        $this->connect();
+        $stmt = $this->connection->prepare($this->CREATE_QUIZ);
+        $stmt->bind_param("i", $maxPoint);
+        $stmt->execute();
+        $lastInsertedId = $this->connection->insert_id;
+        $stmt->close();
+        $this->close();
+        return $lastInsertedId;
+    }
+
+    public function getMaxPoint($id){
+        $this->connect();
+        $stmt = $this->connection->prepare($this->GET_QUIZ_MAX_POINT);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->bind_result($maxPoint);
+        $stmt->fetch();
+        $stmt->close();
+        $this->close();
+        return $maxPoint;
+    }
+    public function updateMaxPoint($id, $maxPoint){
+        $this->connect();
+        $stmt = $this->connection->prepare($this->UPDATE_MAX_POINT);
+        $stmt->bind_param("ii", $maxPoint, $id);
+        $stmt->execute();
+        $stmt->close();
+        $this->close();
+    }
+
+    public function createQuestion($quizId, $question, $answerA, $answerB, $answerC, $answerD, $correctAnswer, $point, $order_num){
+        $this->connect();
+        $stmt = $this->connection->prepare($this->INSERT_QUESTION);
+        $stmt->bind_param("issssssii", $quizId, $question, $answerA, $answerB, $answerC, $answerD, $correctAnswer, $point, $order_num);
+        $stmt->execute();
+        $stmt->close();
+        $this->close();
+    }
+    public function getLastQuestionOrderNum($quizId){
+        $lastOrderNum = NULL;
+        $this->connect();
+        $stmt = $this->connection->prepare($this->FIND_LAST_QUESTION_ORDER_NUM);
+        $stmt->bind_param("i", $quizId);
+        $stmt->execute();
+        $stmt->bind_result($lastOrderNum);
+        $stmt->fetch();
+        $stmt->close();
+        $this->close();
+        return $lastOrderNum;
+    }
+
+    public function deleteQuestion($quizId, $orderNum){
+
+        $this->connect();
+        $stmt = $this->connection->prepare($this->DELETE_QUESTION);
+        $stmt->bind_param("ii", $quizId, $orderNum);
+        $stmt->execute();
+        $stmt->close();
+        $this->close();
+    }
+
+    public function getAllQuestionForQuiz($quizId){
+
+        $this->connect();
+        $stmt = $this->connection->prepare($this->GET_ALL_QUESTION_FOR_QUIZ);
+        $stmt->bind_param("i", $quizId);
+
+        $stmt->execute();
+
+        $stmt->bind_result($quizId, $question, $answerA, $answerB, $answerC, $answerD, $correctAnswer, $point, $orderNum);
+
+        $questions = array();
+
+        while ($stmt->fetch()) {
+            $question = new \admin\Question($quizId, $question, $answerA, $answerB, $answerC, $answerD, $correctAnswer, $point, $orderNum);
+            $questions[] = $question;
+        }
+
+        $stmt->close();
+        $this->close();
+
+        return $questions;
+    }
+
 
     public function getContentOfCourse($courseId){
         $this->connect();

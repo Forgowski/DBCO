@@ -1,0 +1,62 @@
+<?php
+
+namespace admin;
+include '../utils/DbConnector.php';
+
+class QuizHandler
+{
+    public function __construct()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if($_POST['_action'] == "CREATE_QUIZ"){
+                $this->createQuiz();
+            }
+            elseif($_POST['_action'] == "ADD_QUESTION"){
+                $this->addQuestion();
+            }
+        }
+    }
+    private function createQuiz(){
+        $maxPoint = $_POST['point'];
+        $dbConn = new \DbConnector();
+        $quizId = $dbConn->createQuiz($maxPoint);
+        $lastQuestionId = $dbConn->getLastQuestionOrderNum($quizId);
+        $courseId = intval($_POST['_course_id']);
+
+        if(isset($lastQuestionId)){
+            $orderNumQuestion = $lastQuestionId + 1;
+        }
+        else{
+            $orderNumQuestion=0;
+        }
+        $dbConn->createQuestion($quizId,$_POST['question'], $_POST['answerA'], $_POST['answerB'], $_POST['answerC'],
+            $_POST['answerD'], $_POST['answerCorr'], $_POST['point'], $orderNumQuestion);
+
+        $lastOrderNum = $dbConn->getLastOrderNum($courseId);
+        if(isset($lastOrderNum)){
+            $orderNum = $lastOrderNum + 1;
+        }
+        else{
+            $orderNum=0;
+        }
+        $dbConn->putInContent($_POST['_course_id'], $orderNum, $quizId, 'quiz', $_POST['title']);
+    }
+
+    private function addQuestion(){
+        $dbConn = new \DbConnector();
+        $quizId = $_POST['_ext_id'];
+        $lastQuestionId = $dbConn->getLastQuestionOrderNum($quizId);
+        $oldMaxPoint = $dbConn->getMaxPoint($quizId);
+        $maxPoint = $oldMaxPoint + intval($_POST['point']);
+        $dbConn->updateMaxPoint($quizId, $maxPoint);
+        if(isset($lastQuestionId)){
+            $orderNumQuestion = $lastQuestionId + 1;
+        }
+        else{
+            $orderNumQuestion=0;
+        }
+        $dbConn->createQuestion($quizId,$_POST['question'], $_POST['answerA'], $_POST['answerB'], $_POST['answerC'],
+            $_POST['answerD'], $_POST['answerCorr'], $_POST['point'], $orderNumQuestion);
+    }
+}
+$quizHandler = new QuizHandler();
