@@ -51,35 +51,6 @@ class Validator
         return 0;
     }
 
-    public function courseValidation($name, $price, $description, $duration, $category)
-    {
-        if (empty($name) || empty($price) || empty($description) || empty($duration) || empty($category)) {
-            return "All fields are required.";
-        }
-
-        if (!ctype_alnum($name)) {
-            return "Name should be alphanumeric.";
-        }
-
-        if (!ctype_alnum($description)) {
-            return "Description should be alphanumeric.";
-        }
-
-        if (!ctype_alnum($category)) {
-            return "Category should be alphanumeric.";
-        }
-
-        if (!preg_match('/^\d+(\.\d{1,2})?$/', $price)) {
-            return "Invalid price format. Use a number with up to two decimal places.";
-        }
-
-        if (!preg_match('/^\d+$/', $duration)) {
-            return "Duration should be an integer.";
-        }
-
-        return 0;
-    }
-
 
     private function checkPassword($password)
     {

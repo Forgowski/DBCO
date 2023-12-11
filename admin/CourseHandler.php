@@ -2,10 +2,8 @@
 
 namespace admin;
 use DbConnector;
-use Validator;
 
 include_once '../account/User.php';
-include_once '../utils/Validator.php';
 include_once '../utils/DbConnector.php';
 include_once 'Course.php';
 class CourseHandler
@@ -29,26 +27,21 @@ class CourseHandler
     }
     private function updateCourse(){
         $course_id = intval($_POST['_course_id']);
-        $validator = new Validator();
-        $result = $validator->courseValidation($_POST['name'], $_POST['price'],  $_POST['description'], $_POST['timeToComp'], $_POST['category']);
-        if($result == 0){
             $dbConn = new DbConnector();
             $dbConn->updateCourse($_POST['name'], $_POST['author'], $_POST['description'], $_POST['price'], $_POST['category'], $_POST['timeToComp'], $course_id);
-        }
+        header("Location: /DBCO/templates/admin_panel.php");
+        exit();
     }
     private function createCourse(){
-        $validator = new Validator();
-        $result = $validator->courseValidation($_POST['courseName'], $_POST['price'],  $_POST['description'], $_POST['timeToComp'], $_POST['category']);
-        if($result == 0){
-            echo 'tutez';
+
             session_start();
             $dbConn = new DbConnector();
             $user = $dbConn->getUser($_SESSION['user_id']);
             $author = sprintf("%s %s", $user->getFirstName(), $user->getLastName());
             $dbConn->createCourse($_POST['courseName'], $author, $_POST['description'], $_POST['price'], $_POST['category'], $_POST['timeToComp']);
             session_write_close();
-        }
-        echo $result;
+            header("Location: /DBCO/templates/admin_panel.php");
+            exit();
     }
     private function createArticle(){
         $title = $_POST['title'];
@@ -64,6 +57,8 @@ class CourseHandler
         }
         $articleId = $dbConn->createArticle($article);
         $dbConn->putInContent($courseId, $orderNum, $articleId, 'article', $title);
+        header("Location: /DBCO/admin/course_content_manage.php");
+        exit();
     }
     private function editArticle()
     {
@@ -75,6 +70,8 @@ class CourseHandler
         $dbConn = new DbConnector();
         $dbConn->updateContentTitle($title, $courseId, $orderNum);
         $dbConn->updateArticle($article, $extId);
+        header("Location: /DBCO/admin/course_content_manage.php");
+        exit();
     }
 }
 $courseHandler = new CourseHandler();

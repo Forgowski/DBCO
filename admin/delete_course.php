@@ -1,5 +1,5 @@
 <?php
-include_once_once '../utils/DbConnector.php';
+include_once '../utils/DbConnector.php';
 session_start();
 $admin = isset($_SESSION['admin']) ? $_SESSION['admin'] : null;
 if($admin!=1){

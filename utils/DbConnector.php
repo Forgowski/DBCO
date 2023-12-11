@@ -40,6 +40,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
     private $DELETE_QUESTION = "DELETE FROM question WHERE quizId = ? AND order_num = ?;";
     private $MOCK_ORDER = "INSERT INTO  order_t (user_id, course_id) VALUES (?, ?);";
     private $GET_USER_COURSES_ID = "SELECT course_id FROM order_t WHERE user_id = ?;";
+    private $HAVE_ACCESS_TO_COURSE = "SELECT id FROM order_t WHERE user_id = ? AND course_id = ?;";
 
     private $host = "localhost";
     private $username = "root";
@@ -426,6 +427,17 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
         $stmt->execute();
         $stmt->close();
         $this->close();
+    }
+    public function haveAccessToCourse($userId, $courseId){
+        $this->connect();
+        $stmt = $this->connection->prepare($this->HAVE_ACCESS_TO_COURSE);
+        $stmt->bind_param("ii", $userId ,$courseId);
+        $stmt->execute();
+        $stmt->bind_result($id);
+        $stmt->fetch();
+        $stmt->close();
+        $this->close();
+        return $id;
     }
     public function getUserCoursesId($userId){
         $this->connect();
