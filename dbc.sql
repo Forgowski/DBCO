@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 11, 2023 at 07:47 PM
+-- Generation Time: Dec 11, 2023 at 10:25 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -35,7 +35,7 @@ RETURN admin;
 END IF;
 END$$
 
-CREATE DEFINER=`root`@`localhost` FUNCTION `try_log_in` (`email` VARCHAR(40), `password` VARCHAR(256)) RETURNS INT(11)  BEGIN
+CREATE DEFINER=`root`@`localhost` FUNCTION `try_log_in` (`email` VARCHAR(40) CHARSET utf8, `password` VARCHAR(256) CHARSET utf8) RETURNS INT(11)  BEGIN
 DECLARE user_id INT;
 
 SELECT user.id INTO user_id from user WHERE user.email=email AND user.password=password;
@@ -89,7 +89,8 @@ CREATE TABLE `content` (
 
 INSERT INTO `content` (`id`, `course_id`, `order_num`, `type`, `ext_resource_id`, `title`) VALUES
 (18, 6, 0, 'article', 18, 'Pierwszy artykół'),
-(19, 6, 1, 'article', 19, 'Drugi artykół');
+(19, 6, 1, 'article', 19, 'Drugi artykół'),
+(20, 6, 2, 'quiz', 6, 'Pierwszy quiz');
 
 -- --------------------------------------------------------
 
@@ -114,7 +115,7 @@ CREATE TABLE `course` (
 --
 
 INSERT INTO `course` (`id`, `name`, `author`, `description`, `price`, `category`, `aprox_lenght_min`, `rate`, `vote_num`) VALUES
-(6, 'Testowy', 'Adam Kowalski', 'Cieżka zmiana opisu', 39.99, 'Informatyka', 30, 0, 0),
+(6, 'Testowy', 'Adam Kowalski', 'Przykładowy opis kursu', 39.99, 'Informatyka', 30, 0, 0),
 (7, 'Testowy2', 'admin admin', 'Test numer 2', 30, 'Księgowość', 40, 0, 0);
 
 -- --------------------------------------------------------
@@ -128,6 +129,13 @@ CREATE TABLE `order_t` (
   `user_id` int(11) NOT NULL,
   `course_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `order_t`
+--
+
+INSERT INTO `order_t` (`id`, `user_id`, `course_id`) VALUES
+(4, 17, 6);
 
 -- --------------------------------------------------------
 
@@ -147,6 +155,15 @@ CREATE TABLE `question` (
   `order_num` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `question`
+--
+
+INSERT INTO `question` (`quizId`, `question`, `answerA`, `answerB`, `answerC`, `answerD`, `correctAnswer`, `point`, `order_num`) VALUES
+(6, 'Pierwsza litera alfabetu to', 'B', 'C', 'A', 'D', 'A', 3, 0),
+(6, 'Test', 'T', 'E', 'S', 'D', 'T', 3, 1),
+(6, 'Pytanie BDA', 'A', 'B', 'C', 'D', 'A', 3, 2);
+
 -- --------------------------------------------------------
 
 --
@@ -163,7 +180,28 @@ CREATE TABLE `quiz` (
 --
 
 INSERT INTO `quiz` (`id`, `max_point`) VALUES
-(5, 4);
+(5, 4),
+(6, 9);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `score`
+--
+
+CREATE TABLE `score` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `quiz_id` int(11) NOT NULL,
+  `point` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `score`
+--
+
+INSERT INTO `score` (`id`, `user_id`, `quiz_id`, `point`) VALUES
+(1, 17, 6, 6);
 
 -- --------------------------------------------------------
 
@@ -200,7 +238,8 @@ INSERT INTO `user` (`id`, `firstName`, `lastName`, `email`, `password`, `isAdmin
 (13, 'mat', 'mat', 'mat@m.com', '3f3def178746a7e49ebc345d2e8a07b0', 0),
 (14, 'Adam', 'Kowalski', 'map@com.com', '3f3def178746a7e49ebc345d2e8a07b0', 0),
 (15, 'Adam', 'Smoczek', 'ama@com.com', '3f3def178746a7e49ebc345d2e8a07b0', 0),
-(16, 'admin', 'admin', 'admin@admin.com', '3f3def178746a7e49ebc345d2e8a07b0', 1);
+(16, 'admin', 'admin', 'admin@admin.com', '3f3def178746a7e49ebc345d2e8a07b0', 1),
+(17, 'Adam', 'Kowal', 'adam@kow.com', '3f3def178746a7e49ebc345d2e8a07b0', 0);
 
 --
 -- Indexes for dumped tables
@@ -237,6 +276,12 @@ ALTER TABLE `quiz`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `score`
+--
+ALTER TABLE `score`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `user`
 --
 ALTER TABLE `user`
@@ -256,7 +301,7 @@ ALTER TABLE `article`
 -- AUTO_INCREMENT for table `content`
 --
 ALTER TABLE `content`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `course`
@@ -268,19 +313,25 @@ ALTER TABLE `course`
 -- AUTO_INCREMENT for table `order_t`
 --
 ALTER TABLE `order_t`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `quiz`
 --
 ALTER TABLE `quiz`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `score`
+--
+ALTER TABLE `score`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

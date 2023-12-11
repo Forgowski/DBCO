@@ -3,11 +3,7 @@
 namespace admin;
 include_once '../utils/DbConnector.php';
 session_start();
-$admin = isset($_SESSION['admin']) ? $_SESSION['admin'] : null;
-if ($admin != 1) {
-    header("Location: /DBCO/templates/index.php");
-    exit();
-}
+
 class QuizHandler
 {
     public function __construct()
@@ -18,6 +14,9 @@ class QuizHandler
             }
             elseif($_POST['_action'] == "ADD_QUESTION"){
                 $this->addQuestion();
+            }
+            elseif($_POST['_action'] == "CHECK_QUIZ"){
+                $this->checkQuiz();
             }
         }
     }
@@ -65,6 +64,29 @@ class QuizHandler
         $dbConn->createQuestion($quizId,$_POST['question'], $_POST['answerA'], $_POST['answerB'], $_POST['answerC'],
             $_POST['answerD'], $_POST['answerCorr'], $_POST['point'], $orderNumQuestion);
         header("Location: /DBCO/templates/admin_panel.php");
+        exit();
+    }
+    private function checkQuiz(){
+        $dbConn = new \DbConnector();
+        $quizId = $_POST['_quiz_id'];
+        $questions = $dbConn->getAllQuestionForQuiz(intval($quizId));
+        $i = 0;
+        $point = 0;
+        foreach ($questions as $question){
+            $k = 'pytanie' . $i;
+            if($question->getCorrectAnswer() == $_POST[$k]){
+                $point = $point + intval($question->getPoint());
+            }
+        }
+        $userId = intval($_SESSION['user_id']);
+        $oldScore = $dbConn->getUserScore($userId, intval($quizId));
+        if(empty($oldScore)){
+            $dbConn->insertUserScore($userId, intval($quizId), $point);
+        }
+        elseif($oldScore < $point){
+            $dbConn->updateUserScore($point, $userId, intval($quizId));
+        }
+        header("Location: /DBCO/templates/moje_kursy.php");
         exit();
     }
 }

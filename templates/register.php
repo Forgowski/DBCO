@@ -8,11 +8,11 @@ if(isset($_SESSION['user_id'])){
 <section>
     <div>
         <form action="../UserHandler.php" method="post">
-            <label class="lb-registry" for="firstName">Imie</label><input class="inp-txt-input" id="firstName" name="firstName" type="text">
-            <label class="lb-registry" for="lastName">Nazwisko</label><input class="inp-txt-input" id="lastName" name="lastName" type="text">
-            <label class="lb-registry" for="email">Email</label><input class="inp-txt-input" id="email" name="email" type="text">
-            <label class="lb-registry" for="password">Hasło</label><input class="inp-txt-input" id="password" name="password" type="password">
-            <label class="lb-registry" for="re-password">Powtórz hasło</label><input class="inp-txt-input" id="re-password" name="re-password" type="password">
+            <label for="firstName">Imie</label><input id="firstName" name="firstName" type="text">
+            <label for="lastName">Nazwisko</label><input id="lastName" name="lastName" type="text">
+            <label for="email">Email</label><input id="email" name="email" type="text">
+            <label for="password">Hasło</label><input id="password" name="password" type="password">
+            <label for="re-password">Powtórz hasło</label><input id="re-password" name="re-password" type="password">
             <input type="submit" value="Zarejestruj się">
         </form>
     </div>

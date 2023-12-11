@@ -13,27 +13,28 @@ if(empty($access)){
     header("Location: /DBCO/templates/index.php");
     exit();
 }
+$courseId = intval($_GET['course_id']);
+$contents = $dbConn->getContentOfCourse($courseId);
 ?>
 <section>
     <?php
-        $contents = $dbConn->getContentOfCourse(intval($_GET['course_id']));
         foreach ($contents as $content){
             ?>
             <div>
                 <?php
                 if($content->getType()=="article"){
                 ?>
-                <a href ='/DBCO/templates/article?ext_id=<?php echo $content->getExtResourceId()?>'>
+                <a href ='/DBCO/templates/article.php?course_id=<?php echo $courseId?>&ext_id=<?php echo $content->getExtResourceId()?>'>
                 <?php
                 }
                 else{
                 ?>
-                    <a href ='/DBCO/templates/quiz?ext_id=<?php echo $content->getExtResourceId()?>'>
+                    <a href ='/DBCO/templates/quiz.php?course_id=<?php echo $courseId?>&ext_id=<?php echo $content->getExtResourceId()?>'>
                     <?php
                         }
                     ?>
-                    <span><?php $content->getTitle()?></span>
-                    <span><?php $content->getType()?></span>
+                    <span><?php echo $content->getTitle()?></span>
+                    <span><?php echo $content->getType()?></span>
                 </a>
             </div>
         <?php

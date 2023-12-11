@@ -41,6 +41,9 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
     private $MOCK_ORDER = "INSERT INTO  order_t (user_id, course_id) VALUES (?, ?);";
     private $GET_USER_COURSES_ID = "SELECT course_id FROM order_t WHERE user_id = ?;";
     private $HAVE_ACCESS_TO_COURSE = "SELECT id FROM order_t WHERE user_id = ? AND course_id = ?;";
+    private $GET_USER_SCORE = "SELECT point FROM score WHERE user_id = ? AND quiz_id = ?;";
+    private $UPDATE_USER_SCORE = "UPDATE score SET point = ? WHERE user_id = ? AND quiz_id = ?;";
+    private $INSERT_USER_SCORE = "INSERT INTO score (user_id, quiz_id, point) VALUES (?,?,?);";
 
     private $host = "localhost";
     private $username = "root";
@@ -450,6 +453,35 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
         $stmt->close();
         $this->close();
         return $coursesId;
+    }
+    public function getUserScore($userId, $quizId){
+        $this->connect();
+        $stmt = $this->connection->prepare($this->GET_USER_SCORE);
+        $stmt->bind_param("ii", $userId, $quizId);
+        $stmt->execute();
+        $stmt->bind_result($point);
+        $stmt->fetch();
+        $stmt->close();
+        $this->close();
+        return $point;
+    }
+
+    public function updateUserScore($point, $userId, $quizId){
+        $this->connect();
+        $stmt = $this->connection->prepare($this->UPDATE_USER_SCORE);
+        $stmt->bind_param("iii",$point, $userId, $quizId);
+        $stmt->execute();
+        $stmt->close();
+        $this->close();
+    }
+
+    public function insertUserScore($userId, $quizId, $point){
+        $this->connect();
+        $stmt = $this->connection->prepare($this->INSERT_USER_SCORE);
+        $stmt->bind_param("iii",$userId, $quizId, $point);
+        $stmt->execute();
+        $stmt->close();
+        $this->close();
     }
     private function connect(){
         $this->connection = new mysqli($this->host, $this->username, $this->password, $this->databaseName);

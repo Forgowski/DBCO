@@ -44,7 +44,6 @@ class UserHandler
         }
         else{
             //tutaj zwracanie błędów do sesji
-            echo 'trol';
         }
     }
     private function login(){
