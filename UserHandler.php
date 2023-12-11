@@ -44,7 +44,7 @@ class UserHandler
         }
         else{
             //tutaj zwracanie błędów do sesji
-            echo 'trol';
+            echo $response;
         }
     }
     private function login(){
@@ -74,6 +74,7 @@ class UserHandler
             $dbConect = new DbConnector();
             $dbConect->updateUserData($_POST['firstName'],  $_POST['lastName'], $_POST['email'], $_SESSION['user_id']);
         }
+        
         session_write_close();
         header("Location: templates/ustawienia.php");
         exit();
@@ -92,6 +93,9 @@ class UserHandler
                 $dbConn = new DbConnector();
                 $hashPassword = md5($_POST['password']);
                 $dbConn->updateUserPassword($hashPassword, $_SESSION['user_id']);
+            }
+            else{
+                echo $result;
             }
         }
         else{
