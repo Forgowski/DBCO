@@ -1,5 +1,5 @@
 <?php
-
+include "../admin/Content.php";
 
 class DbConnector
 {
@@ -14,6 +14,7 @@ class DbConnector
     private $DELETE_COURSE_BY_ID = "DELETE FROM course WHERE id = ?;";
     private $DELETE_CONTENT_BY_ID = "DELETE FROM content WHERE order_num = ? AND course_id = ?;";
     private $FIND_LAST_ORDER_NUM = "SELECT order_num FROM content WHERE course_id = ? ORDER BY order_num DESC LIMIT 1;";
+    private $UPDATE_CONTENT_TITLE = "UPDATE content SET title = ? WHERE course_id = ? AND order_num = ?;";
 
     private $CREATE_COURSE = "INSERT INTO course (name, author, description, price, category, aprox_lenght_min, rate, vote_num) 
 VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
@@ -22,7 +23,10 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
     private $GET_COURSE_BY_ID = "SELECT * FROM course WHERE id = ?;";
     private $GET_ALL_COURSES = "SELECT * FROM course";
     private $CREATE_ARTICLE = "INSERT INTO article (text_content) VALUES (?)";
+    private $UPDATE_ARTICLE = "UPDATE article SET text_content = ? WHERE id = ?";
+    private $GET_ARTICLE = "SELECT text_content FROM article WHERE ID = ?;";
     private $INSERT_TO_CONTENT = "INSERT INTO content (course_id, order_num, type, ext_resource_id, title) VALUES (?, ?, ?, ?, ?);";
+    private $GET_CONTENT = "SELECT * FROM content WHERE course_id = ? AND order_num = ?;";
 
     private $host = "localhost";
     private $username = "root";
@@ -126,6 +130,46 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
 
         return $courses;
     }
+    public function getContent($courseId, $orderNum){
+        $this->connect();
+        $stmt = $this->connection->prepare($this->GET_CONTENT);
+        $stmt->bind_param("ii", $courseId, $orderNum);
+        $stmt->execute();
+        $stmt->bind_result($id, $courseId, $orderNum, $type, $extResourceId, $title);
+        $stmt->fetch();
+        $content = new \admin\Content($id, $title, $type, $courseId, $orderNum, $extResourceId);
+        $stmt->close();
+        $this->close();
+        return $content;
+    }
+
+    public function updateContentTitle($title, $couserId, $orderNum){
+        $this->connect();
+        $stmt = $this->connection->prepare($this->UPDATE_CONTENT_TITLE);
+        $stmt->bind_param("sii", $title, $couserId, $orderNum);
+        $stmt->execute();
+        $stmt->close();
+        $this->close();
+    }
+    public function getArticle($ext_id){
+        $this->connect();
+        $stmt = $this->connection->prepare($this->GET_ARTICLE);
+        $stmt->bind_param("i", $ext_id);
+        $stmt->execute();
+        $stmt->bind_result($article);
+        $stmt->fetch();
+        $stmt->close();
+        $this->close();
+        return $article;
+    }
+    public function updateArticle($article, $ext_id){
+        $this->connect();
+        $stmt = $this->connection->prepare($this->UPDATE_ARTICLE);
+        $stmt->bind_param("si", $article,  $ext_id);
+        $stmt->execute();
+        $stmt->close();
+        $this->close();
+    }
 
     public function getContentOfCourse($courseId){
         $this->connect();
@@ -174,11 +218,15 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
     }
 
     public function getLastOrderNum($courseId){
+        $lastOrderNum = NULL;
         $this->connect();
+        echo $courseId;
         $stmt = $this->connection->prepare($this->FIND_LAST_ORDER_NUM);
         $stmt->bind_param("i", $courseId);
         $stmt->execute();
         $stmt->bind_result($lastOrderNum);
+        $stmt->fetch();
+        echo $lastOrderNum;
         $stmt->close();
         $this->close();
         return $lastOrderNum;

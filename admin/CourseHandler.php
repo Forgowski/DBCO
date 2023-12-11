@@ -22,7 +22,10 @@ class CourseHandler
             elseif(isset($_POST['_action']) && $_POST['_action'] == 'CREATE_ARTICLE'){
                 $this->createArticle();
             }
-        }
+            elseif(isset($_POST['_action']) && $_POST['_action'] == 'EDIT_ARTICLE'){
+                $this->editArticle();
+            }
+    }
     }
     private function updateCourse(){
         $course_id = intval($_POST['_course_id']);
@@ -50,16 +53,28 @@ class CourseHandler
     private function createArticle(){
         $title = $_POST['title'];
         $article = $_POST['article'];
-        $courseId = $_POST['_course_id'];
+        $courseId = intval($_POST['_course_id']);
         $dbConn = new DbConnector();
         $lastOrderNum = $dbConn->getLastOrderNum($courseId);
+        if(isset($lastOrderNum)){
+            $orderNum = $lastOrderNum + 1;
+        }
+        else{
+            $orderNum=0;
+        }
         $articleId = $dbConn->createArticle($article);
-        $dbConn->putInContent($courseId, $lastOrderNum, $articleId, 'article', $title);
+        $dbConn->putInContent($courseId, $orderNum, $articleId, 'article', $title);
     }
     private function editArticle()
     {
-
+        $title = $_POST['title'];
+        $article = $_POST['article'];
+        $courseId = intval($_POST['_course_id']);
+        $orderNum = intval($_POST['_order_num']);
+        $extId = intval($_POST['_ext_id']);
+        $dbConn = new DbConnector();
+        $dbConn->updateContentTitle($title, $courseId, $orderNum);
+        $dbConn->updateArticle($article, $extId);
     }
-
 }
 $courseHandler = new CourseHandler();

@@ -1,6 +1,5 @@
 <?php
 require_once '../templates/header.php';
-include 'Content.php';
 include '../utils/DbConnector.php';
 $admin = isset($_SESSION['admin']) ? $_SESSION['admin'] : null;
 if($admin!=1){
@@ -17,17 +16,15 @@ $contents = $dbConn->getContentOfCourse($id);
     foreach ($contents as $content) {
     ?>
     <div class = 'crs'>
-
-        <span><?php echo $content->getOrderNum();?></span>
             <span><?php echo $content->getTitle();?></span>
             <span><?php echo $content->getType();?></span>
         <span>
-        <a href='/DBCO/admin/course_detail_manage.php?id=<?php echo $content->getId(); ?>'>
+        <a href='/DBCO/admin/edit_content.php?course_id=<?php echo $content->getCourseId(); ?>&order=<?php echo $content->getOrderNum(); ?>&type=<?php echo $content->getType();?>'>
             Edytuj zawartość
         </a>
         </span>
         <span>
-        <a href='/DBCO/admin/delete_content.php?id=<?php echo $id; ?>&order=<?php echo $content->getId(); ?>'>
+        <a href='/DBCO/admin/delete_content.php?id=<?php echo $id; ?>&order=<?php echo $content->getOrderNum(); ?>'>
             Usuń zawartość
         </a>
         </span>
