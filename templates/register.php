@@ -1,30 +1,19 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-</head>
-<body>
-<header>
-    <nav>
-        <ul>
-            <li><a href="#">Strona Główna</a></li>
-            <li><a href="#">O nas</a></li>
-            <li><a href="#">Kursy</a></li>
-            <li><a href="#">Kontakt</a></li>
-        </ul>
-    </nav>
-</header>
+<?php
+require_once "header.php";
+if(isset($_SESSION['user_id'])){
+    header("Location: templates/index.php");
+    exit();
+}
+?>
 <section>
     <div>
-        <form action="" method="post">
+        <form action="../UserHandler.php" method="post">
             <label class="lb-registry" for="firstName">Imie</label><input class="inp-txt-input" id="firstName" name="firstName" type="text">
             <label class="lb-registry" for="lastName">Nazwisko</label><input class="inp-txt-input" id="lastName" name="lastName" type="text">
-            <label class="lb-registry" for="nick">Nick</label><input class="inp-txt-input" id="nick" name="nick" type="text">
             <label class="lb-registry" for="email">Email</label><input class="inp-txt-input" id="email" name="email" type="text">
             <label class="lb-registry" for="password">Hasło</label><input class="inp-txt-input" id="password" name="password" type="password">
             <label class="lb-registry" for="re-password">Powtórz hasło</label><input class="inp-txt-input" id="re-password" name="re-password" type="password">
+            <input type="submit" value="Zarejestruj się">
         </form>
     </div>
 </section>

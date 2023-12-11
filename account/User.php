@@ -6,15 +6,13 @@ class User
     private $firstName;
     private $lastName;
     private $mail;
-    private $password;
     private $isAdmin; //boolean
 
-    public function __construct($firstName, $lastName, $mail, $password, $isAdmin=0)
+    public function __construct($firstName, $lastName, $mail, $isAdmin=0)
     {
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->mail = $mail;
-        $this->password = $password;
         $this->isAdmin = $isAdmin;
     }
 
