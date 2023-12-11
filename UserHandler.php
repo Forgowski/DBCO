@@ -33,7 +33,14 @@ class UserHandler
         if($response == 0) {
             $hashPassword = md5($_POST['password']);
             $dbConect = new DbConnector();
-            $dbConect->createUser($_POST['firstName'],  $_POST['lastName'], $_POST['email'], $hashPassword);
+            $user_id = $dbConect->createUser($_POST['firstName'],  $_POST['lastName'], $_POST['email'], $hashPassword);
+            session_start();
+            $_SESSION['user_id'] = $user_id;
+            $admin = $dbConect->isAdmin($user_id);
+            $_SESSION['admin'] = $admin;
+            session_write_close();
+            header("Location: templates/index.php");
+            exit();
         }
         else{
             //tutaj zwracanie błędów do sesji
