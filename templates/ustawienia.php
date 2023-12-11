@@ -15,7 +15,7 @@ $user = $dbConn->getUser($user_id);
         <div>Moje dane</div>
         <form action="../UserHandler.php" method="POST">
             <label for="firstName">Imie</label>
-            <inpu id="firstName" name="firstName" type="text"
+            <input id="firstName" name="firstName" type="text"
                    value="<?php echo $user->getFirstName(); ?>">
             <label for="lastName">Nazwisko</label>
             <input id="lastName" name="lastName" type="text"
