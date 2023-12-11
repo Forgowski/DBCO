@@ -1,7 +1,7 @@
 <?php
 require_once "header.php";
-include '../utils/DbConnector.php';
-include '../account/User.php';
+include_once '../utils/DbConnector.php';
+include_once '../account/User.php';
 if(!isset($_SESSION['user_id'])){
     header("Location: templates/index.php");
     exit();

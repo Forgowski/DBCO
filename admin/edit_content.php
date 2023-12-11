@@ -1,6 +1,6 @@
 <?php
 require_once '../templates/header.php';
-include '../utils/DbConnector.php';
+include_once '../utils/DbConnector.php';
 
 $type = $_GET['type'];
 ?>

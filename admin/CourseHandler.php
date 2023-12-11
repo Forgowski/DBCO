@@ -4,10 +4,10 @@ namespace admin;
 use DbConnector;
 use Validator;
 
-include '../account/User.php';
-include '../utils/Validator.php';
-include '../utils/DbConnector.php';
-include 'Course.php';
+include_once '../account/User.php';
+include_once '../utils/Validator.php';
+include_once '../utils/DbConnector.php';
+include_once 'Course.php';
 class CourseHandler
 {
     public function __construct()

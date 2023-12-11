@@ -1,7 +1,7 @@
 <?php
 
 namespace admin;
-include '../utils/DbConnector.php';
+include_once '../utils/DbConnector.php';
 $admin = isset($_SESSION['admin']) ? $_SESSION['admin'] : null;
 if ($admin != 1) {
     header("Location: /DBCO/templates/index.php");

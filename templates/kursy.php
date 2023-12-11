@@ -1,7 +1,7 @@
 <?php
 require_once "header.php";
-include "../utils/DbConnector.php";
-include "../admin/Course.php";
+include_once "../utils/DbConnector.php";
+include_once "../admin/Course.php";
 ?>
 <section>
     <?php
@@ -17,4 +17,5 @@ include "../admin/Course.php";
             <p><?php echo $course->getPrice(); ?></p>
             </a>
         </div>
+    <?php } ?>
 </section>

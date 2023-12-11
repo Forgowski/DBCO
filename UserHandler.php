@@ -1,8 +1,8 @@
 <?php
 
-include 'utils/DbConnector.php';
-include 'utils/Validator.php';
-include 'account/User.php';
+include_once 'utils/DbConnector.php';
+include_once 'utils/Validator.php';
+include_once 'account/User.php';
 
 class UserHandler
 {

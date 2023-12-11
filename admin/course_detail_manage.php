@@ -1,6 +1,6 @@
 <?php
-include '../utils/DbConnector.php';
-include 'Course.php';
+include_once '../utils/DbConnector.php';
+include_once 'Course.php';
 session_start();
 $admin = isset($_SESSION['admin']) ? $_SESSION['admin'] : null;
 if($admin!=1){

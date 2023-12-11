@@ -1,6 +1,7 @@
 <?php
-include "../admin/Content.php";
-include "../admin/Question.php";
+include_once "../admin/Content.php";
+include_once "../admin/Question.php";
+include_once "../admin/Course.php";
 
 class DbConnector
 {
@@ -37,6 +38,8 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
     private $UPDATE_MAX_POINT = "UPDATE quiz SET max_point = ? WHERE id = ?;";
     private $GET_ALL_QUESTION_FOR_QUIZ = "SELECT * FROM question where quizId = ? order by order_num;";
     private $DELETE_QUESTION = "DELETE FROM question WHERE quizId = ? AND order_num = ?;";
+    private $MOCK_ORDER = "INSERT INTO  order_t (user_id, course_id) VALUES (?, ?);";
+    private $GET_USER_COURSES_ID = "SELECT course_id FROM order_t WHERE user_id = ?;";
 
     private $host = "localhost";
     private $username = "root";
@@ -416,6 +419,28 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
         return $admin;
     }
 
+    public function mockOrder($userId, $courseId){
+        $this->connect();
+        $stmt = $this->connection->prepare($this->MOCK_ORDER);
+        $stmt->bind_param("ii", $userId ,$courseId);
+        $stmt->execute();
+        $stmt->close();
+        $this->close();
+    }
+    public function getUserCoursesId($userId){
+        $this->connect();
+        $stmt = $this->connection->prepare($this->GET_USER_COURSES_ID);
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $stmt->bind_result($courseId);
+        $coursesId = array();
+        while ($stmt->fetch()) {
+            $coursesId[] = $courseId;
+        }
+        $stmt->close();
+        $this->close();
+        return $coursesId;
+    }
     private function connect(){
         $this->connection = new mysqli($this->host, $this->username, $this->password, $this->databaseName);
         if ($this->connection->connect_error) {
