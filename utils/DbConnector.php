@@ -1,8 +1,6 @@
 <?php
 
 
-//use mysqli;
-
 class DbConnector
 {
     private $INSERT_INT0_USER = "INSERT INTO user (firstName, lastName, email, password, isAdmin) VALUES (?, ?, ?, ?, ?);";
@@ -11,14 +9,21 @@ class DbConnector
     private $UPDATE_USER = "UPDATE user SET firstName = ?, lastName = ?, email = ? WHERE id = ?;";
     private $UPDATE_USER_PASSWORD = "UPDATE user SET password = ? WHERE id = ?;";
     private $DELETE_USER_BY_ID = "DELETE FROM user WHERE id = ?;";
+    private $UPDATE_COURSE = "UPDATE course SET name = ?, author = ?, description = ?, price = ?, category = ?, aprox_lenght_min = ? WHERE id = ?;";
 
     private $DELETE_COURSE_BY_ID = "DELETE FROM course WHERE id = ?;";
+    private $DELETE_CONTENT_BY_ID = "DELETE FROM content WHERE order_num = ? AND course_id = ?;";
+    private $FIND_LAST_ORDER_NUM = "SELECT order_num FROM content WHERE course_id = ? ORDER BY order_num DESC LIMIT 1;";
+
     private $CREATE_COURSE = "INSERT INTO course (name, author, description, price, category, aprox_lenght_min, rate, vote_num) 
 VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
-    private $GET_COURSE_BY_NAME = "SELECT * FROM course WHERE name = ?";
-    private $GET_COURSE_BY_ID = "SELECT * FROM course WHERE id = ?";
-
+    private $GET_CONTENT_ASSOCIATE_WITH_COURSE = "SELECT * FROM content WHERE course_id = ? ORDER BY order_num";
+    private $GET_COURSE_BY_NAME = "SELECT * FROM course WHERE name = ?;";
+    private $GET_COURSE_BY_ID = "SELECT * FROM course WHERE id = ?;";
     private $GET_ALL_COURSES = "SELECT * FROM course";
+    private $CREATE_ARTICLE = "INSERT INTO article (text_content) VALUES (?)";
+    private $INSERT_TO_CONTENT = "INSERT INTO content (course_id, order_num, type, ext_resource_id, title) VALUES (?, ?, ?, ?, ?);";
+
     private $host = "localhost";
     private $username = "root";
     private $password = "";
@@ -33,7 +38,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
     public function getCourseById($id){
         $this->connect();
         $stmt = $this->connection->prepare($this->GET_COURSE_BY_ID);
-        $stmt->bind_param("s", $id);
+        $stmt->bind_param("i", $id);
         $stmt->execute();
         $name = null;
         $author = null;
@@ -44,8 +49,8 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
         $rate = null;
         $vote_num = null;
         $stmt->bind_result($id, $name, $author, $description, $price, $category, $aprox_lenght_min, $rate, $vote_num);
-        $course = new \admin\Course($id, $name, $price, $aprox_lenght_min, $author, $category, $description, $rate, $vote_num);
         $stmt->fetch();
+        $course = new \admin\Course($id, $name, $price, $aprox_lenght_min, $author, $category, $description, $rate, $vote_num);
         $stmt->close();
         $this->close();
         return $course;
@@ -72,26 +77,15 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
         return $course;
     }
 
-    public function getAllCourses(){
+
+    public function updateCourse($name, $author, $description, $price, $category, $aprox_lenght_min, $id){
         $this->connect();
-        $stmt = $this->connection->prepare($this->GET_ALL_COURSES);
+        $stmt = $this->connection->prepare($this->UPDATE_COURSE);
+        $aproxInt = intval($aprox_lenght_min);
+        $stmt->bind_param("sssdsii", $name, $author, $description, $price, $category, $aproxInt, $id);
         $stmt->execute();
-
-        $stmt->bind_result($id, $name, $author, $description, $price, $category, $aprox_lenght_min, $rate, $vote_num);
-
-        $courses = array();
-
-        while ($stmt->fetch()) {
-            $course = new \admin\Course($id, $name, $price, $aprox_lenght_min, $author, $category, $description, $rate, $vote_num);
-            $courses[] = $course;
-        }
-
         $stmt->close();
         $this->close();
-
-        return $courses;
-
-
     }
 
     public function createCourse($name, $author, $description, $price, $category, $aprox_lenght_min, $rate=0, $vote_num=0){
@@ -113,7 +107,82 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
         $stmt->close();
         $this->close();
     }
+    public function getAllCourses(){
+        $this->connect();
+        $stmt = $this->connection->prepare($this->GET_ALL_COURSES);
+        $stmt->execute();
 
+        $stmt->bind_result($id, $name, $author, $description, $price, $category, $aprox_lenght_min, $rate, $vote_num);
+
+        $courses = array();
+
+        while ($stmt->fetch()) {
+            $course = new \admin\Course($id, $name, $price, $aprox_lenght_min, $author, $category, $description, $rate, $vote_num);
+            $courses[] = $course;
+        }
+
+        $stmt->close();
+        $this->close();
+
+        return $courses;
+    }
+
+    public function getContentOfCourse($courseId){
+        $this->connect();
+        $stmt = $this->connection->prepare($this->GET_CONTENT_ASSOCIATE_WITH_COURSE);
+        $stmt->bind_param("i", $courseId);
+        $stmt->execute();
+        $contents = array();
+        $stmt->bind_result($id, $courseId, $orderNum, $type, $extResourceId, $title);
+
+        while ($stmt->fetch()) {
+            $content = new \admin\Content($id, $title, $type, $courseId, $orderNum, $extResourceId);
+            $contents[] = $content;
+        }
+
+        $stmt->close();
+        $this->close();
+        return $contents;
+    }
+    public function deleteContent($id, $orderNum){
+        $this->connect();
+        $stmt = $this->connection->prepare($this->DELETE_CONTENT_BY_ID);
+        $stmt->bind_param("ii", $orderNum, $id);
+        $stmt->execute();
+        $stmt->close();
+        $this->close();
+    }
+
+    public function createArticle($text){
+        $this->connect();
+        $stmt = $this->connection->prepare($this->CREATE_ARTICLE);
+        $stmt->bind_param("s", $text);
+        $stmt->execute();
+        $lastInsertedId = $this->connection->insert_id;
+        $stmt->close();
+        $this->close();
+        return $lastInsertedId;
+    }
+
+    public function putInContent($courseId, $orderNum, $ext_resource_Id, $type, $title){
+        $this->connect();
+        $stmt = $this->connection->prepare($this->INSERT_TO_CONTENT);
+        $stmt->bind_param("iisis", $courseId, $orderNum, $type, $ext_resource_Id, $title);
+        $stmt->execute();
+        $stmt->close();
+        $this->close();
+    }
+
+    public function getLastOrderNum($courseId){
+        $this->connect();
+        $stmt = $this->connection->prepare($this->FIND_LAST_ORDER_NUM);
+        $stmt->bind_param("i", $courseId);
+        $stmt->execute();
+        $stmt->bind_result($lastOrderNum);
+        $stmt->close();
+        $this->close();
+        return $lastOrderNum;
+    }
     public function createUser($firstName, $lastName, $mail, $hashPassword, $isAdmin=0)
     {
         $user_id = null;

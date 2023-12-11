@@ -51,7 +51,7 @@ class Validator
         return 0;
     }
 
-    public function createCourseValidation($name, $price, $description, $duration, $category)
+    public function courseValidation($name, $price, $description, $duration, $category)
     {
         if (empty($name) || empty($price) || empty($description) || empty($duration) || empty($category)) {
             return "All fields are required.";

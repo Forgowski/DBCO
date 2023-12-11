@@ -14,14 +14,28 @@ class CourseHandler
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_POST['_action']) && $_POST['_action'] == 'CREATE_COURSE') {
-                echo 'wchodze';
                 $this->createCourse();
             }
+            elseif(isset($_POST['_action']) && $_POST['_action'] == 'UPDATE'){
+                $this->updateCourse();
+            }
+            elseif(isset($_POST['_action']) && $_POST['_action'] == 'CREATE_ARTICLE'){
+                $this->createArticle();
+            }
+        }
+    }
+    private function updateCourse(){
+        $course_id = intval($_POST['_course_id']);
+        $validator = new Validator();
+        $result = $validator->courseValidation($_POST['name'], $_POST['price'],  $_POST['description'], $_POST['timeToComp'], $_POST['category']);
+        if($result == 0){
+            $dbConn = new DbConnector();
+            $dbConn->updateCourse($_POST['name'], $_POST['author'], $_POST['description'], $_POST['price'], $_POST['category'], $_POST['timeToComp'], $course_id);
         }
     }
     private function createCourse(){
         $validator = new Validator();
-        $result = $validator->createCourseValidation($_POST['courseName'], $_POST['price'],  $_POST['description'], $_POST['timeToComp'], $_POST['category']);
+        $result = $validator->courseValidation($_POST['courseName'], $_POST['price'],  $_POST['description'], $_POST['timeToComp'], $_POST['category']);
         if($result == 0){
             echo 'tutez';
             session_start();
@@ -33,5 +47,19 @@ class CourseHandler
         }
         echo $result;
     }
+    private function createArticle(){
+        $title = $_POST['title'];
+        $article = $_POST['article'];
+        $courseId = $_POST['_course_id'];
+        $dbConn = new DbConnector();
+        $lastOrderNum = $dbConn->getLastOrderNum($courseId);
+        $articleId = $dbConn->createArticle($article);
+        $dbConn->putInContent($courseId, $lastOrderNum, $articleId, 'article', $title);
+    }
+    private function editArticle()
+    {
+
+    }
+
 }
 $courseHandler = new CourseHandler();
