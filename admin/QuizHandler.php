@@ -2,6 +2,7 @@
 
 namespace admin;
 include_once '../utils/DbConnector.php';
+session_start();
 $admin = isset($_SESSION['admin']) ? $_SESSION['admin'] : null;
 if ($admin != 1) {
     header("Location: /DBCO/templates/index.php");
@@ -44,6 +45,8 @@ class QuizHandler
             $orderNum=0;
         }
         $dbConn->putInContent($_POST['_course_id'], $orderNum, $quizId, 'quiz', $_POST['title']);
+        header("Location: /DBCO/templates/admin_panel.php");
+        exit();
     }
 
     private function addQuestion(){
@@ -61,6 +64,8 @@ class QuizHandler
         }
         $dbConn->createQuestion($quizId,$_POST['question'], $_POST['answerA'], $_POST['answerB'], $_POST['answerC'],
             $_POST['answerD'], $_POST['answerCorr'], $_POST['point'], $orderNumQuestion);
+        header("Location: /DBCO/templates/admin_panel.php");
+        exit();
     }
 }
 $quizHandler = new QuizHandler();

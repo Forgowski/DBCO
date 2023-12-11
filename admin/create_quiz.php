@@ -21,9 +21,6 @@ $questNum = isset($_GET['quest']) ? $_GET['quest'] : null;
         <label for="point">Punkty do zdobycia</label><input type="number" max="3" min="1" name="point" id="point" value="1">
         <input type="hidden" name="_action" value='CREATE_QUIZ'>
         <input type="hidden" name="_course_id" value='<?php echo $_GET['id']?>'>
-
-
-
         <input type="submit" value="Zapisz">
     </form>
 </section>

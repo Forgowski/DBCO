@@ -319,13 +319,11 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
     public function getLastOrderNum($courseId){
         $lastOrderNum = NULL;
         $this->connect();
-        echo $courseId;
         $stmt = $this->connection->prepare($this->FIND_LAST_ORDER_NUM);
         $stmt->bind_param("i", $courseId);
         $stmt->execute();
         $stmt->bind_result($lastOrderNum);
         $stmt->fetch();
-        echo $lastOrderNum;
         $stmt->close();
         $this->close();
         return $lastOrderNum;

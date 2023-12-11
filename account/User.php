@@ -6,7 +6,7 @@ class User
     private $firstName;
     private $lastName;
     private $mail;
-    private $isAdmin; //boolean
+    private $isAdmin;
 
     public function __construct($firstName, $lastName, $mail, $isAdmin=0)
     {
