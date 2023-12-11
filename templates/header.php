@@ -9,9 +9,8 @@
     <nav>
         <ul>
             <li><a href="/DBCO/templates/index.php">Strona Główna</a></li>
-            <li><a href="#">O nas</a></li>
-            <li><a href="#">Kursy</a></li>
-            <li><a href="#">Kontakt</a></li>
+            <li><a href="/DBCO/templates/about.php">O nas</a></li>
+            <li><a href="/DBCO/templates/kursy.php">Kursy</a></li>
             <?php
             session_start();
             $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
