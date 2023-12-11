@@ -47,7 +47,6 @@ $type = $_GET['type'];
     </form>
         <div>Usuń pytanie</div>
         <?php
-
         foreach ($questions as $question) {
         ?>
         <div class = 'crs'>

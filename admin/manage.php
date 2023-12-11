@@ -2,6 +2,11 @@
 require_once '../templates/header.php';
 include 'Course.php';
 include '../utils/DbConnector.php';
+$admin = isset($_SESSION['admin']) ? $_SESSION['admin'] : null;
+if ($admin != 1) {
+    header("Location: /DBCO/templates/index.php");
+    exit();
+}
 ?>
 <section>
     <?php

@@ -1,5 +1,10 @@
 <?php
 require_once '../templates/header.php';
+$admin = isset($_SESSION['admin']) ? $_SESSION['admin'] : null;
+if ($admin != 1) {
+    header("Location: /DBCO/templates/index.php");
+    exit();
+}
 $questNum = isset($_GET['quest']) ? $_GET['quest'] : null;
 ?>
 
